@@ -1,0 +1,26 @@
+{
+  "service": {
+    "nom": "Service exemple",
+    "echantillons": "Page d'accueil, parcours de connexion, parcours de recherche",
+    "entite_evaluation": "Équipe qualité",
+    "responsable_evaluation": "Prénom Nom",
+    "date_evaluation": "2026-04-17"
+  },
+  "criteres": [
+    {
+      "id": "1.1",
+      "evaluation": "Conforme",
+      "texte_declaration": "Le service exemple a été évalué favorablement en termes d'utilité en tenant compte des ODD 9 et 12. Il permet de dématérialiser une démarche qui mobilisait auparavant des envois postaux pour 40 000 usagers/an."
+    },
+    {
+      "id": "1.3",
+      "evaluation": "Conforme",
+      "texte_declaration": "Personnes référentes en écoconception numérique pour le service :\n• Prénom Nom\n• Lead développement durable"
+    },
+    {
+      "id": "2.5",
+      "evaluation": "Non applicable",
+      "texte_declaration": "Le service ne repose sur aucun objet connecté ni matériel dédié."
+    }
+  ]
+}

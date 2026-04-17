@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/simoncloitre/RGESN/schemas/declaration.schema.json",
+  "title": "Déclaration d'écoconception RGESN 2024",
+  "description": "Format pivot entre le skill rgesn-assess (qui produit ce fichier) et rgesn-fill-xlsx (qui le consomme).",
+  "type": "object",
+  "required": ["service", "criteres"],
+  "properties": {
+    "service": {
+      "type": "object",
+      "required": ["nom", "date_evaluation"],
+      "properties": {
+        "nom": { "type": "string", "description": "Nom du service évalué" },
+        "echantillons": { "type": "string", "description": "Chemins critiques / unités fonctionnelles évalués" },
+        "entite_evaluation": { "type": "string", "description": "Organisation qui procède à l'évaluation" },
+        "responsable_evaluation": { "type": "string", "description": "Nom du responsable de l'évaluation" },
+        "date_evaluation": { "type": "string", "format": "date", "description": "YYYY-MM-DD" }
+      }
+    },
+    "criteres": {
+      "type": "array",
+      "description": "Une entrée par critère RGESN (78 au total). Les critères non renseignés restent à 'À évaluer' dans le xlsx.",
+      "items": {
+        "type": "object",
+        "required": ["id", "evaluation"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d+$",
+            "description": "Identifiant du critère, ex: '1.1', '4.8'"
+          },
+          "evaluation": {
+            "type": "string",
+            "enum": ["Conforme", "Non conforme", "Non applicable", "À évaluer"],
+            "description": "Statut de conformité. 'Non applicable' uniquement si la colonne 'Cible' du critère le permet."
+          },
+          "date_evaluation": {
+            "type": "string",
+            "format": "date",
+            "description": "Date d'évaluation du critère (YYYY-MM-DD). Par défaut, celle du service."
+          },
+          "texte_declaration": {
+            "type": "string",
+            "description": "Texte publié dans la déclaration PDF (cellule fusionnée C:G de la ligne de continuation). Doit justifier la conformité en se basant sur la colonne 'Moyen de test' du critère."
+          },
+          "evolutions_potentielles": {
+            "type": "string",
+            "description": "Améliorations envisagées (colonne G publique). Optionnel."
+          },
+          "actions_a_mener": {
+            "type": "string",
+            "description": "Actions concrètes identifiées (colonne I, usage interne). Optionnel."
+          },
+          "qui": {
+            "type": "string",
+            "description": "Responsable de l'action (colonne J, usage interne). Optionnel."
+          },
+          "quand": {
+            "type": "string",
+            "description": "Échéance de l'action (colonne K, usage interne). Optionnel."
+          }
+        }
+      }
+    }
+  }
+}

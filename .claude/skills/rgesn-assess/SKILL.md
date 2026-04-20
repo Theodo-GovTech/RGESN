@@ -9,6 +9,10 @@ Ce skill transforme un projet (code + contexte) en un `declaration.json` conform
 
 ## Sources à connaître
 
+Ces fichiers appartiennent au **toolkit RGESN**. Chercher dans cet ordre :
+1. le répertoire courant (si l'utilisateur travaille dans le repo RGESN lui-même),
+2. sinon `~/.claude/rgesn-toolkit/` (emplacement par défaut de `install.sh`).
+
 - `data/criteres_rgesn.json` — les 78 critères structurés (id, libellé, priorité, difficulté, pondération, cible, moyen de test, exemple de texte de déclaration). **Lis ce fichier en premier**, c'est la source de vérité.
 - `docs/referentiel_rgesn_2024.pdf` — le référentiel officiel complet. À consulter quand le `moyen_test` d'un critère est ambigu ou quand l'utilisateur demande le détail d'un critère.
 - `schemas/declaration.schema.json` — le format de sortie à respecter.
@@ -32,7 +36,7 @@ Ce skill transforme un projet (code + contexte) en un `declaration.json` conform
    - Questions ciblées à l'utilisateur pour les critères organisationnels (stratégie, UX/UI, contenus) — **grouper les questions par thème** pour limiter les allers-retours.
    - Marquer `À évaluer` en dernier recours, jamais par défaut.
 
-4. **Écrire le résultat** dans `out/declaration.json` (créer `out/` si besoin) en suivant strictement `schemas/declaration.schema.json`.
+4. **Écrire le résultat** dans `out/declaration.json` du **projet courant** (créer `out/` si besoin) en suivant strictement `schemas/declaration.schema.json`.
 
 ## Règles de rédaction du `texte_declaration`
 

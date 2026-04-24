@@ -22,6 +22,8 @@ Feuille "Score d'avancement" :
   - C8 : responsable
   - C11 : date de l'évaluation
 """
+from __future__ import annotations
+
 import json
 import re
 import shutil

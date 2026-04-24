@@ -11,11 +11,20 @@ Ce skill est l'expert Excel : il prend un `declaration.json` (produit par `rgesn
 
 **Ne jamais réimplémenter le remplissage** : toute la logique de mapping cellule ↔ critère est dans `scripts/fill_xlsx.py`. Appeler ce script, pas d'autre chemin.
 
+Ce script et ses ressources (template `.xlsx`, schéma) font partie du **toolkit RGESN**. Emplacements possibles, dans cet ordre :
+1. le répertoire courant (si l'utilisateur travaille dans le repo RGESN lui-même),
+2. sinon `~/.claude/rgesn-toolkit/` (emplacement installé par `install.sh`).
+
+Commande recommandée, en utilisant le venv du toolkit quand il existe :
+
 ```bash
-python scripts/fill_xlsx.py <declaration.json> [<output.xlsx>]
+# Depuis n'importe quel projet, avec le toolkit installé globalement :
+~/.claude/rgesn-toolkit/.venv/bin/python \
+  ~/.claude/rgesn-toolkit/scripts/fill_xlsx.py \
+  <declaration.json> [<output.xlsx>]
 ```
 
-Si l'environnement virtuel `.venv` du repo existe, préférer :
+Ou, depuis une copie locale du repo :
 
 ```bash
 .venv/bin/python scripts/fill_xlsx.py <declaration.json>
@@ -24,7 +33,8 @@ Si l'environnement virtuel `.venv` du repo existe, préférer :
 Si la dépendance `openpyxl` manque :
 
 ```bash
-python -m venv .venv && .venv/bin/pip install openpyxl
+python3 -m venv ~/.claude/rgesn-toolkit/.venv \
+  && ~/.claude/rgesn-toolkit/.venv/bin/pip install openpyxl
 ```
 
 ## Entrée attendue

@@ -22,6 +22,8 @@ Feuille "Score d'avancement" :
   - C8 : responsable
   - C11 : date de l'évaluation
 """
+from __future__ import annotations
+
 import json
 import re
 import shutil
@@ -37,6 +39,16 @@ CRITERES = ROOT / "data" / "criteres_rgesn.json"
 SCHEMA = ROOT / "schemas" / "declaration.schema.json"
 
 VALID_EVAL = {"Conforme", "Non conforme", "Non applicable", "À évaluer"}
+
+# Mapping terminologie RGESN (schéma JSON) → options de la liste déroulante du xlsx officiel.
+# Le template attend "Validé / Non validé", pas "Conforme / Non conforme" — sinon data validation
+# rejette la cellule avec "Input must be an item on the specified list".
+EVAL_TO_XLSX = {
+    "Conforme": "Validé",
+    "Non conforme": "Non validé",
+    "Non applicable": "Non applicable",
+    "À évaluer": "À évaluer",
+}
 
 
 def slugify(s: str) -> str:
@@ -89,7 +101,8 @@ def fill(declaration_path: Path, output_path: Path | None = None) -> Path:
             continue
         ws = wb[meta["feuille_xlsx"]]
         row = meta["ligne_xlsx"]
-        ws.cell(row=row, column=5, value=c.get("evaluation", "À évaluer"))
+        evaluation = c.get("evaluation", "À évaluer")
+        ws.cell(row=row, column=5, value=EVAL_TO_XLSX.get(evaluation, evaluation))
         ws.cell(row=row, column=6, value=c.get("date_evaluation") or eval_date)
         if c.get("evolutions_potentielles"):
             ws.cell(row=row, column=7, value=c["evolutions_potentielles"])
@@ -105,7 +118,8 @@ def fill(declaration_path: Path, output_path: Path | None = None) -> Path:
 
     wb.save(output_path)
 
-    print(f"OK {written} critères écrits dans {output_path.relative_to(ROOT)}")
+    rel = output_path.relative_to(ROOT) if output_path.is_relative_to(ROOT) else output_path
+    print(f"OK {written} critères écrits dans {rel}")
     if unknown:
         print(f"  Avertissement : ids inconnus ignorés : {', '.join(unknown)}")
     return output_path

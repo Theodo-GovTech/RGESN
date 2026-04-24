@@ -103,17 +103,17 @@ if [ "${RGESN_NO_PYTHON:-}" != "1" ]; then
       info "Création du venv Python dans $TOOLKIT_DIR/.venv"
       python3 -m venv "$TOOLKIT_DIR/.venv"
     fi
-    "$TOOLKIT_DIR/.venv/bin/pip" install --quiet --upgrade pip openpyxl
-    ok "openpyxl installé dans le venv du toolkit"
+    "$TOOLKIT_DIR/.venv/bin/pip" install --quiet --upgrade pip openpyxl python-docx
+    ok "openpyxl et python-docx installés dans le venv du toolkit"
   else
-    warn "python3 introuvable — rgesn-fill-xlsx ne fonctionnera pas tant que Python et openpyxl ne sont pas installés"
+    warn "python3 introuvable — rgesn-fill-xlsx et rgesn-fill-docx ne fonctionneront pas tant que Python, openpyxl et python-docx ne sont pas installés"
   fi
 fi
 
 echo
 ok "Installation terminée."
 echo "   Toolkit  : $TOOLKIT_DIR"
-echo "   Skills   : $CLAUDE_HOME/skills/{rgesn-assess,rgesn-fill-xlsx}"
+echo "   Skills   : $CLAUDE_HOME/skills/{rgesn-assess,rgesn-fill-xlsx,rgesn-fill-docx}"
 echo "   Commandes: $CLAUDE_HOME/commands/rgesn-audit-*.md, /rgesn-generate-declaration, /rgesn-review-pr-ecoconception"
 echo
 echo "Dans Claude Code, sur n'importe quel projet :"

@@ -24,19 +24,24 @@ Ces fichiers appartiennent au **toolkit RGESN**. Chercher dans cet ordre :
    - Échantillons évalués (chemins critiques / unités fonctionnelles)
    - Entité qui évalue, responsable, date
 
-2. **Pour chaque critère**, déterminer :
+2. **Première passe automatique — examen direct** : parcourir les 78 critères et évaluer tout ce qui est directement observable dans le code, la config, les manifests, le CI, la documentation du projet (architecture, frontend, backend, hébergement, algorithmie sont largement auditables ainsi). Pour chaque critère, déterminer :
    - `evaluation` ∈ { `Conforme`, `Non conforme`, `Non applicable`, `À évaluer` }
      - `Non applicable` uniquement si le champ `cible` du critère le permet (ex: "N/A si le service n'utilise pas d'IA"). Sinon c'est `Conforme` ou `Non conforme`.
-     - `À évaluer` si l'information manque — préférer poser la question à l'utilisateur plutôt que d'inventer.
+     - `À évaluer` (état temporaire) si l'information manque — **ne jamais inventer**, le critère passera à l'étape 3.
    - `texte_declaration` — rédaction publiable. S'inspirer du template dans `exemple_declaration` quand il existe, mais le personnaliser avec les éléments réels du service. Ne **jamais** laisser `[à compléter]` dans la sortie finale.
    - `evolutions_potentielles`, `actions_a_mener`, `qui`, `quand` — optionnels, à renseigner quand utile.
 
-3. **Stratégie d'évaluation** — privilégier dans cet ordre :
-   - Examen direct du code / de la config / de la documentation du projet (architecture, frontend, backend, hébergement, algorithmie sont largement auditables).
-   - Questions ciblées à l'utilisateur pour les critères organisationnels (stratégie, UX/UI, contenus) — **grouper les questions par thème** pour limiter les allers-retours.
-   - Marquer `À évaluer` en dernier recours, jamais par défaut.
+3. **Seconde passe — mode interactif question / réponse** pour tous les critères encore `À évaluer` après la première passe :
+   - Utiliser le tool **`AskUserQuestion`** pour transformer chaque lacune en question à choix multiples (le même style d'interaction que le plan mode).
+   - **Regrouper les critères par thème** (stratégie, UX/UI, contenus, organisationnel, hébergement…) et traiter un thème à la fois. À chaque tour, envoyer jusqu'à **4 questions en parallèle** dans un seul appel `AskUserQuestion` pour limiter les allers-retours.
+   - Pour chaque question, proposer **2 à 4 options concrètes et mutuellement exclusives** qui couvrent les cas typiques du critère (ex : « Oui, documenté », « Oui, mais non documenté », « Non »). Ne pas ajouter d'option « Autre » : le tool la fournit automatiquement.
+   - Dans `header` (≤ 12 car.), mettre l'**id du critère** (ex : `1.3`, `4.14`) pour que l'utilisateur voie à quel critère la question se rapporte.
+   - Dans `question`, reformuler le `moyen_test` du critère en langage naturel.
+   - Exploiter chaque réponse pour compléter immédiatement `evaluation` + `texte_declaration` + éventuellement `actions_a_mener`. Citer la réponse utilisateur dans le texte de déclaration plutôt que de la paraphraser vaguement.
+   - Si l'utilisateur choisit « Autre » avec une note libre, en tenir compte littéralement.
+   - Si l'utilisateur demande explicitement à sauter une question (réponse « Je ne sais pas », « Passer », etc.), alors — et seulement alors — laisser `evaluation: "À évaluer"` avec une note dans `actions_a_mener` indiquant qui doit trancher.
 
-4. **Écrire le résultat** dans `out/declaration.json` du **projet courant** (créer `out/` si besoin) en suivant strictement `schemas/declaration.schema.json`.
+4. **Écrire le résultat** dans `out/declaration.json` du **projet courant** (créer `out/` si besoin) en suivant strictement `schemas/declaration.schema.json`. Avant d'écrire, vérifier qu'aucun critère ne reste en `À évaluer` sans action associée.
 
 ## Règles de rédaction du `texte_declaration`
 
@@ -45,6 +50,36 @@ Ces fichiers appartiennent au **toolkit RGESN**. Chercher dans cet ordre :
 - Citer les preuves concrètes (fichiers, outils, méthodologies, dates, métriques) plutôt que des formules génériques.
 - Pour un critère `Non conforme`, décrire honnêtement l'écart plutôt que le masquer — la transparence est un objectif du RGESN.
 - Pour `Non applicable`, reformuler la raison de non-applicabilité en citant la cible du critère.
+
+## Exemple d'appel `AskUserQuestion` en seconde passe
+
+```jsonc
+{
+  "questions": [
+    {
+      "header": "1.3",
+      "question": "Un référent écoconception est-il identifié dans l'équipe ?",
+      "multiSelect": false,
+      "options": [
+        { "label": "Oui, nommé et documenté", "description": "Une personne est désignée et c'est écrit quelque part (charte, README, fiche de poste)." },
+        { "label": "Oui, mais informel",       "description": "Une personne joue ce rôle de fait, sans désignation écrite." },
+        { "label": "Non",                       "description": "Aucune personne n'a cette responsabilité aujourd'hui." }
+      ]
+    },
+    {
+      "header": "4.13",
+      "question": "Les notifications sont-elles désactivées par défaut et paramétrables par l'utilisateur ?",
+      "multiSelect": false,
+      "options": [
+        { "label": "Oui aux deux",        "description": "Désactivées par défaut ET paramétrables." },
+        { "label": "Paramétrables seulement", "description": "Paramétrables mais activées par défaut." },
+        { "label": "Non",                 "description": "Activées par défaut et non configurables." },
+        { "label": "Pas de notifications", "description": "Le service n'envoie aucune notification — critère non applicable." }
+      ]
+    }
+  ]
+}
+```
 
 ## Quand s'arrêter
 

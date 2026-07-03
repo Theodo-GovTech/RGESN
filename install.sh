@@ -1,23 +1,24 @@
 #!/usr/bin/env bash
 # install.sh — installe les skills RGESN dans ~/.claude/
 #
-# Usage :
-#   curl -fsSL https://raw.githubusercontent.com/Theodo-GovTech/RGESN/main/install.sh | bash
+# Usage (dépôt privé — installation via SSH) :
+#   git clone git@github.com:Theodo-GovTech/RGESN.git ~/.claude/rgesn-toolkit
+#   ~/.claude/rgesn-toolkit/install.sh
 #
-# ou, depuis un clone local :
+# ou, depuis un clone local existant :
 #   ./install.sh
 #
 # Variables d'environnement optionnelles :
 #   CLAUDE_CONFIG_DIR   répertoire Claude Code cible (défaut: ~/.claude)
 #   RGESN_BRANCH        branche à utiliser (défaut: main)
-#   RGESN_REPO_URL      URL du repo (défaut: https://github.com/Theodo-GovTech/RGESN.git)
+#   RGESN_REPO_URL      URL du repo (défaut: git@github.com:Theodo-GovTech/RGESN.git)
 #   RGESN_TOOLKIT_DIR   emplacement du clone (défaut: $CLAUDE_CONFIG_DIR/rgesn-toolkit)
 #   RGESN_NO_PYTHON=1   ne pas installer openpyxl
 set -euo pipefail
 
 CLAUDE_HOME="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 TOOLKIT_DIR="${RGESN_TOOLKIT_DIR:-$CLAUDE_HOME/rgesn-toolkit}"
-REPO_URL="${RGESN_REPO_URL:-https://github.com/Theodo-GovTech/RGESN.git}"
+REPO_URL="${RGESN_REPO_URL:-git@github.com:Theodo-GovTech/RGESN.git}"
 BRANCH="${RGESN_BRANCH:-main}"
 
 # Couleurs minimales (tty seulement)

@@ -4,10 +4,13 @@ Skills Claude Code pour appliquer le **Référentiel Général d'Écoconception 
 
 L'objectif : **évaluer un service numérique** face aux 78 critères, **rédiger la déclaration d'écoconception publique (docx)** et **remplir le tableur officiel (xlsx)** — directement depuis Claude Code, sur n'importe quel projet, sans quitter votre IDE.
 
-## Installation (une ligne)
+## Installation
+
+> Le dépôt est **privé** : l'installation se fait via SSH (le `curl … | bash` public ne peut pas fonctionner). Assurez-vous d'avoir une [clé SSH configurée sur GitHub](https://docs.github.com/authentication/connecting-to-github-with-ssh) avec accès à l'organisation `Theodo-GovTech`.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Theodo-GovTech/RGESN/main/install.sh | bash
+git clone git@github.com:Theodo-GovTech/RGESN.git ~/.claude/rgesn-toolkit
+~/.claude/rgesn-toolkit/install.sh
 ```
 
 Le script :
@@ -112,7 +115,7 @@ Cette séparation permet de relire / éditer le JSON avant remplissage, et d'iso
 Pour hacker sur les skills sans passer par l'installation globale :
 
 ```bash
-git clone https://github.com/Theodo-GovTech/RGESN.git
+git clone git@github.com:Theodo-GovTech/RGESN.git
 cd RGESN
 python3 -m venv .venv && .venv/bin/pip install openpyxl python-docx
 

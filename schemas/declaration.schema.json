@@ -58,6 +58,16 @@
           "quand": {
             "type": "string",
             "description": "Échéance de l'action (colonne K, usage interne). Optionnel."
+          },
+          "effort": {
+            "type": "string",
+            "enum": ["Faible", "Moyen", "Fort"],
+            "description": "Effort estimé pour ce service (utilisé par rgesn-roadmap). Par défaut, la difficulté du référentiel. Optionnel."
+          },
+          "depend_de": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^\\d+\\.\\d+$" },
+            "description": "Ids des critères dont l'action doit être menée avant (utilisé par rgesn-roadmap). Optionnel."
           }
         }
       }

@@ -15,7 +15,7 @@ git clone git@github.com:Theodo-GovTech/RGESN.git ~/.claude/rgesn-toolkit
 
 Le script :
 1. clone (ou met à jour) le toolkit dans `~/.claude/rgesn-toolkit/` ;
-2. installe les trois skills dans `~/.claude/skills/` (liens symboliques vers le toolkit — `git pull` suffit pour mettre à jour) ;
+2. installe les skills dans `~/.claude/skills/` (liens symboliques vers le toolkit — `git pull` suffit pour mettre à jour) ;
 3. installe les prompts d'audit thématiques dans `~/.claude/commands/` (accessibles via `/rgesn-audit-…`) ;
 4. crée un venv Python dans le toolkit et installe `openpyxl` et `python-docx` (nécessaires pour remplir le tableur et le document).
 
@@ -44,6 +44,7 @@ rm -rf ~/.claude/rgesn-toolkit ~/.claude/skills/rgesn-* ~/.claude/commands/rgesn
 | « rédige la déclaration d'écoconception » | `rgesn-assess` |
 | « remplis le tableur RGESN » | `rgesn-fill-xlsx` |
 | « génère la déclaration publique » / « produis le docx » | `rgesn-fill-docx` |
+| « fais la roadmap » / « plan d'avancement » / « next steps » | `rgesn-roadmap` |
 | `/rgesn-audit-frontend`, `/rgesn-audit-backend`, `/rgesn-audit-infra`, `/rgesn-audit-ia`, `/rgesn-audit-contenus`, `/rgesn-audit-rgesn` | audits thématiques ciblés |
 | `/rgesn-generate-declaration` | variante courte de génération |
 | `/rgesn-review-pr-ecoconception` | revue d'une PR sous l'angle RGESN |
@@ -55,10 +56,11 @@ rm -rf ~/.claude/rgesn-toolkit ~/.claude/skills/rgesn-* ~/.claude/commands/rgesn
 3. **Tableur d'audit** — demandez à Claude de générer le tableur. Le skill `rgesn-fill-xlsx` écrit `out/<service>_<date>.xlsx` en respectant le template officiel (usage interne : scores et conformité détaillée).
 4. **Déclaration publique** — demandez à Claude de générer la déclaration. Le skill `rgesn-fill-docx` écrit `out/<service>_<date>.docx`, document narratif structuré comme l'exemple officiel et destiné à être publié sur le site du service.
 5. **Export PDF** — ouvrez le `.xlsx` dans Excel (instructions d'export en `E5` de la feuille *Score d'avancement*) ou exportez le `.docx` depuis Word.
+6. **Plan d'avancement** — demandez la roadmap. Le skill `rgesn-roadmap` réestime l'effort des critères non validés, repère les dépendances entre actions et écrit un Markdown phasé (quick wins → chantiers structurants) avec le score projeté après chaque phase.
 
 ## Architecture
 
-Trois skills complémentaires reliés par un JSON pivot :
+Quatre skills complémentaires reliés par un JSON pivot (`rgesn-roadmap` lit le même JSON que les deux skills de remplissage) :
 
 ```
                                                           ┌───────────────────┐   xlsx rempli (audit)
@@ -73,6 +75,7 @@ projet analysé     ┌────────────────┐  decl
 - **`rgesn-assess`** — lit `data/criteres_rgesn.json`, évalue les 78 critères (Conforme / Non conforme / Non applicable / À évaluer) et rédige le texte de déclaration. Sortie : `declaration.json` conforme à `schemas/declaration.schema.json`.
 - **`rgesn-fill-xlsx`** — remplit une copie de `docs/rgesn_2024_outil_declaration.xlsx` (tableur d'audit interne, scores et conformité).
 - **`rgesn-fill-docx`** — génère un document Word narratif structuré comme `docs/rgesn_2024_exemple_declaration.docx` (déclaration publique à publier sur le site du service).
+- **`rgesn-roadmap`** — produit le plan d'avancement en Markdown à partir du même JSON (`scripts/roadmap.py`, bibliothèque standard uniquement).
 
 Cette séparation permet de relire / éditer le JSON avant remplissage, et d'isoler la complexité Office dans deux scripts uniques (`scripts/fill_xlsx.py`, `scripts/fill_docx.py`).
 
@@ -91,13 +94,15 @@ Cette séparation permet de relire / éditer le JSON avant remplissage, et d'iso
 ├── scripts/
 │   ├── extract_criteres.py         # régénère data/criteres_rgesn.json depuis le xlsx
 │   ├── fill_xlsx.py                # remplit le template xlsx depuis un declaration.json
-│   └── fill_docx.py                # génère la déclaration docx depuis un declaration.json
+│   ├── fill_docx.py                # génère la déclaration docx depuis un declaration.json
+│   └── roadmap.py                  # génère le plan d'avancement (Markdown) depuis un declaration.json
 ├── examples/
 │   └── declaration.minimal.json    # exemple conforme au schéma
 ├── .claude/skills/                 # skills Claude Code (installés via install.sh)
 │   ├── rgesn-assess/SKILL.md
 │   ├── rgesn-fill-xlsx/SKILL.md
-│   └── rgesn-fill-docx/SKILL.md
+│   ├── rgesn-fill-docx/SKILL.md
+│   └── rgesn-roadmap/SKILL.md
 ├── skills/                         # prompts d'audit thématiques (slash commands)
 │   ├── audit-rgesn.md
 │   ├── audit-frontend.md

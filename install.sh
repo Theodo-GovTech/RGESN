@@ -114,7 +114,7 @@ fi
 echo
 ok "Installation terminée."
 echo "   Toolkit  : $TOOLKIT_DIR"
-echo "   Skills   : $CLAUDE_HOME/skills/{rgesn-assess,rgesn-fill-xlsx,rgesn-fill-docx}"
+echo "   Skills   : $CLAUDE_HOME/skills/{rgesn-assess,rgesn-fill-xlsx,rgesn-fill-docx,rgesn-roadmap}"
 echo "   Commandes: $CLAUDE_HOME/commands/rgesn-audit-*.md, /rgesn-generate-declaration, /rgesn-review-pr-ecoconception"
 echo
 echo "Dans Claude Code, sur n'importe quel projet :"

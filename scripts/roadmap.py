@@ -63,6 +63,9 @@ def load_declaration(path: Path) -> dict:
             raise ValueError(f"Évaluation invalide pour {c.get('id')} : {c['evaluation']!r}")
         if c.get("effort") and c["effort"] not in EFFORTS:
             raise ValueError(f"Effort invalide pour {c.get('id')} : {c['effort']!r}")
+        deps = c.get("depend_de", [])
+        if not isinstance(deps, list) or not all(isinstance(d, str) for d in deps):
+            raise ValueError(f"depend_de invalide pour {c.get('id')} : liste d'ids attendue, reçu {deps!r}")
     return data
 
 
@@ -80,7 +83,9 @@ def cell(s: str | None) -> str:
 
 
 def plan(declaration: dict, index: OrderedDict) -> dict:
-    entries = {c["id"]: c for c in declaration["criteres"] if c["id"] in index}
+    # Comme dans le tableur, un critère absent du JSON reste « À évaluer » et compte au dénominateur.
+    entries = {cid: {"id": cid, "evaluation": "À évaluer", "absent": True} for cid in index}
+    entries.update({c["id"]: c for c in declaration["criteres"] if c["id"] in index})
 
     applicables = [cid for cid, c in entries.items() if c.get("evaluation") != "Non applicable"]
     denom = sum(index[cid]["ponderation"] for cid in applicables)
@@ -156,6 +161,8 @@ def render(declaration: dict, index: OrderedDict, p: dict) -> str:
 
     def action(cid: str) -> tuple[str, bool]:
         c = entries[cid]
+        if c.get("absent"):
+            return "Évaluer le critère (absent du declaration.json).", True
         if c.get("actions_a_mener"):
             return c["actions_a_mener"], True
         if c.get("evolutions_potentielles"):
@@ -230,15 +237,24 @@ def render(declaration: dict, index: OrderedDict, p: dict) -> str:
 
     sans_action = [cid for ids in p["by_phase"].values() for cid in ids if not action(cid)[1]]
     sans_qui = owners.get("[À attribuer]", [])
-    if sans_action or sans_qui:
+    todo_ids = [cid for ids in p["by_phase"].values() for cid in ids]
+    sans_quand = [cid for cid in todo_ids if not entries[cid].get("quand")]
+    absents = [cid for cid in todo_ids if entries[cid].get("absent")]
+    manques = []
+    if absents:
+        manques.append(f"- Critères absents du declaration.json, comptés « À évaluer » : {len(absents)}")
+    if sans_action:
+        manques.append(f"- Action à définir : {', '.join(sorted(sans_action, key=id_sort_key))}")
+    if sans_qui:
+        manques.append(f"- Responsable à attribuer : {', '.join(sorted(sans_qui, key=id_sort_key))}")
+    if sans_quand and len(sans_quand) == len(todo_ids):
+        manques.append("- Aucune échéance renseignée (champ `quand`).")
+    elif sans_quand:
+        manques.append(f"- Échéance à fixer : {', '.join(sorted(sans_quand, key=id_sort_key))}")
+    if manques:
         out.append("## Points à compléter")
         out.append("")
-        if sans_action:
-            out.append(f"- Action à définir : {', '.join(sorted(sans_action, key=id_sort_key))}")
-        if sans_qui:
-            out.append(f"- Responsable à attribuer : {', '.join(sorted(sans_qui, key=id_sort_key))}")
-        if not any(entries[cid].get("quand") for ids in p["by_phase"].values() for cid in ids):
-            out.append("- Aucune échéance renseignée (champ `quand`).")
+        out.extend(manques)
         out.append("")
 
     return "\n".join(out)

@@ -31,7 +31,7 @@ python3 ~/.claude/rgesn-toolkit/scripts/roadmap.py <declaration.json> [<output.m
 - **Effort** : par défaut, la `difficulte` du référentiel (`data/criteres_rgesn.json`). Le champ optionnel `effort` d'un critère dans le JSON la remplace ; le rapport marque alors l'effort d'un astérisque.
 - **Dépendances** : le champ optionnel `depend_de` (liste d'ids) repousse une action au moins dans la phase de ses dépendances, et la place après elles.
 - **Ordre dans une phase** : pondération décroissante (gain de score), puis priorité, puis id.
-- **Score** : même formule que le tableur officiel (Σ pondérations validées / Σ pondérations applicables ; N/A exclus ; `À évaluer` compte au dénominateur).
+- **Score** : même formule que le tableur officiel (Σ pondérations validées / Σ pondérations applicables ; N/A exclus ; `À évaluer` compte au dénominateur). Un critère absent du JSON est traité comme `À évaluer`, comme dans le tableur : il apparaît en phase 0 avec l'action « Évaluer le critère ».
 - **Action affichée** : `actions_a_mener`, sinon `evolutions_potentielles`, sinon `[À définir]`. Responsable : `qui`, sinon `[À attribuer]`. Échéance : `quand`.
 
 ## Déroulé attendu
